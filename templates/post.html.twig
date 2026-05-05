@@ -1,0 +1,69 @@
+{{-post.build()-}}
+<article class="post post-default post-{{post.id}} h-entry m--0" id="post-{{post.id}}">
+{% if not post.nameIsId or post.imagePath is not empty or postsCount == 0 %}
+	<header class="postHeader">
+{%	if postsCount == 0 and post.imagePath is not empty %}
+		<div class="postHeaderMedia"><a href="{{post.imagePath}}"><img src="{{post.thumbPath ?? post.imagePath}}" alt="{{post.imageAlt ?? 'image'}}" /></a></div>
+{%	endif %}
+{%	if not post.nameIsId or postsCount == 0 %}
+{%		if postsCount == 0 %}
+		<h1 class="postHeading p-name">{{post.name}}</h1>
+{%		else %}
+		<h2 class="postHeading p-name"><a class="postHeadingAction u-url" href="{{path(wikiRoute, {path: post.path})}}">{{post.name}}</a></h2>
+{%		endif %}
+{%	endif %}
+	</header>
+{% endif %}
+	<header class="postMeta">
+		<div class="postMetaMain">
+			{% if post.nameIsId and postsCount > 0 %}<h2 class="postHeading"><a class="permalink u-url" href="{{path(wikiRoute, {path: post.path})}}" title="Post {{post.permalinkTitle}}" rel="bookmark">{% endif %}
+				<time class="dt-published postTime" datetime="{{post.date|date('Y-m-d H:i')}}" pubdate="pubdate">{{post.date|date(dateFormat)}}</time>
+			{% if post.nameIsId and postsCount > 0 %}</a></h2>{% endif %}
+{% if post.terms is defined %}
+			<span class="postTags">
+				in
+				<span class="postTagsList">
+{%	for tag in post.terms %}
+{%		if postsCount == 0 %}
+					<span class="postTag"><a class="postTagAction p-category" href="{{path(wikiRoute, {path: tag.url})}}" rel="tag">{{tag.name}}</a></span>
+{%		else %}
+					<span class="postTag p-category" rel="tag">{{tag.name}}</span>
+{%		endif %}
+{%	endfor %}
+				</span>
+			</span>
+{% endif %}
+		</div>
+{% if postsCount == 0 %}
+		<div><a class="postPermalink permalink u-url" href="{{path(wikiRoute, {path: post.path})}}" title="Permalink to {{post.permalinkTitle}}" rel="bookmark">Permalink</a></div>
+{% endif %}
+	</header>
+	<div class="postContent {{postsCount == 0 ? 'e-content' : 'p-summary'}}">
+{% if postsCount > 0 %}
+		{{post.getExcerpt(postsCount > 20)|raw}}
+{% else %}
+		{{post.content|raw}}
+{% endif %}
+{% if postsCount > 0 and post.hasMore %}
+		<a class="more-link" href="{{path(wikiRoute, {path: post.path})}}">Continue reading <span class="sro"> post "{{post.name}}"</span></a>
+{% endif %}
+	</div>
+	<hr />
+{% if postsCount == 0 %}
+		{{include(blogRelNavTemplate ?? '@TJMWikiBlog/relNav.html.twig')}}
+{% endif %}
+</article>
+{#-!
+{% if postsCount == 0 %}
+seems like it should be in article
+as separate page, {postUrl}/comments
+if($postType === 'single' || $postType === 'page'){
+	comments_template('', true);
+}
+eg
+<aside class="postComments comments postAside" id="comments">
+	<p>To reply to this post,  post on your blog and send a pingback, or <a href="mailto:admin@tobymackenzie.com">email me</a>.</p>
+	<hr />
+</aside>
+{% endif %}
+#}

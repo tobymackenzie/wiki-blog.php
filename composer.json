@@ -1,0 +1,32 @@
+{
+	"name": "tjm/wiki-blog",
+	"description": "Blog \"plugin\" for 'tjm/wiki-site'.  Blog from structured folder of markdown files.",
+	"authors": [
+		{
+			"name": "Toby Mackenzie",
+			"email": "public@tobymackenzie.com",
+			"homepage": "https://www.tobymackenzie.com"
+		}
+	],
+	"license": "0BSD",
+	"autoload": {
+		"psr-4": {
+			"TJM\\WikiBlog\\": "src",
+			"TJM\\WikiBlogBundle\\": "src"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"TJM\\WikiBlog\\Tests\\": "tests"
+		}
+	},
+	"require": {
+		"php": ">=7.4",
+		"symfony/framework-bundle": "^5.4|^6.4",
+		"tjm/wiki-site": "^0"
+	},
+	"require-dev": {
+		"symfony/browser-kit": "^5.4|^6.4",
+		"tjm/dev": "*"
+	}
+}

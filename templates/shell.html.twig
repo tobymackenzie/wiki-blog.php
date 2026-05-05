@@ -1,0 +1,11 @@
+{% extends shellTemplate ?? '@TJMWikiSite/shell.html.twig' %}
+{% block docMeta %}
+{{ parent() }}
+{% if feedPath is not empty %}
+<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="{{feedPath}}" />
+{% endif %}
+{% if robots is not empty %}
+<meta name="robots" content="{{robots}}" />
+{% endif %}
+{% endblock %}
+

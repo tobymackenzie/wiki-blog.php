@@ -1,0 +1,18 @@
+{% extends '@TJMWikiBlog/shell.html.twig' %}
+{% block content %}
+<header class="a--mhead">
+	<h1>{{name}}</h1>
+{% if content is not empty %}
+	<div>{{content|raw}}</div>
+{% endif %}
+</header>
+<div class="blogPosts{% if postsCount > 5 %} blogPosts-long{% endif %}">
+{% for post in posts %}
+	{{include(postTemplate ?? '@TJMWikiBlog/post.html.twig', {post: post})}}
+{% else %}
+	<p>No posts match your request.</p>
+{% endfor %}
+{{include(blogRelNavTemplate ?? '@TJMWikiBlog/relNav.html.twig')}}
+</div>
+{% endblock content %}
+

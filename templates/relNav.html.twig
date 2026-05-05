@@ -1,0 +1,11 @@
+{% if relPrev is defined or relNext is defined  %}
+<nav id="nav-below"	class="nav relNav relNav-list a--mfoot" aria-label="posts" role="navigation" >
+{%	if relNext is defined %}
+	<div class="nextNav relNavItem"><a href="{{relNext.path}}">{{relNext.name}}</a></div>
+{%	endif %}
+{%	if relPrev is defined %}
+	<div class="prevNav relNavItem"><a href="{{relPrev.path}}">{{relPrev.name}}</a></div>
+{%	endif %}
+	<hr />
+</nav>
+{% endif %}

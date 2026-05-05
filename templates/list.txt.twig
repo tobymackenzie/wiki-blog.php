@@ -1,0 +1,18 @@
+{% extends shellTemplate ?? '@TJMWikiSite/shell.txt.twig' %}
+{% block content %}
+{{name}}
+====================
+
+{% if content is not empty %}
+{{content|trim|raw}}
+
+--------------------------------------------
+
+{% endif %}
+{% for post in posts %}
+{{include(postTemplate ?? '@TJMWikiBlog/post.txt.twig', {post: post})}}
+{% else %}
+No posts match your criteria.
+{% endfor %}
+{% endblock content %}
+
