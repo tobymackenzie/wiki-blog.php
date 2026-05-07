@@ -45,22 +45,21 @@ class Demo{
 		}));
 		$twig->addExtension(new DebugExtension());
 		$twig->enableDebug();
-		$wsite = new WikiSite(
-			new Wiki([
-				'path'=> getenv('WIKI_PATH') ?: __DIR__ . '/../../demo/_wiki',
-			]),
-			[
-				'converters'=> [
-					new HtmlToMarkdownConverter(),
-					new MarkdownToCleanMarkdownConverter(),
-					new MarkdownToHtmlConverter(),
-				],
-				'eventDispatcher'=> new EventDispatcher(),
-				'router'=> $router,
-				'twig'=> $twig,
+		$wiki = new Wiki([
+			'path'=> getenv('WIKI_PATH') ?: __DIR__ . '/../../demo/_wiki',
+			'eventDispatcher'=> new EventDispatcher(),
+		]);
+		$wsite = new WikiSite([
+			'converters'=> [
+				new HtmlToMarkdownConverter(),
+				new MarkdownToCleanMarkdownConverter(),
+				new MarkdownToHtmlConverter(),
 			],
-		);
-		$wsite->addPlugin(new Blog($wsite, $conf));
+			'router'=> $router,
+			'twig'=> $twig,
+		]);
+		$wiki->addPlugin($wsite);
+		$wiki->addPlugin(new Blog($wsite, $conf));
 		return $wsite;
 	}
 	static public function getHost(){

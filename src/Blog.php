@@ -9,15 +9,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use TJM\Wiki\File;
+use TJM\Wiki\Plugin;
 use TJM\Wiki\Wiki;
 use TJM\WikiBlog\Post;
 use TJM\WikiSite\Event\ViewDataEvent;
 use TJM\WikiSite\Event\ViewStartEvent;
 use TJM\WikiSite\Event\ViewNameEvent;
-use TJM\WikiSite\PluginInterface;
 use TJM\WikiSite\WikiSite;
 
-class Blog implements PluginInterface{
+class Blog extends Plugin{
 	//-! POST_PATH_TO: define URL path structure used for detail pages
 	// eg /post-name
 	// const POST_PATH_TO_BASE = 0;
@@ -36,7 +36,7 @@ class Blog implements PluginInterface{
 	protected int $indexCount = 12;
 	protected int $maxCount = 100;
 	protected WikiSite $site;
-	protected Wiki $wiki;
+	protected ?Wiki $wiki;
 	//--paths / urls
 	protected string $blogPath = '/blog';
 	//-! if categoryPath or tagPath empty, will need smarter logic to figure out what non-year strings match
