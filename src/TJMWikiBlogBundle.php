@@ -1,5 +1,5 @@
 <?php
-namespace TJM\WikiBlogBundle;
+namespace TJM\WikiBlog;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class TJMWikiBlogBundle extends Bundle{
