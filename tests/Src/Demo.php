@@ -36,13 +36,6 @@ class Demo{
 		$twig->addFunction(new TwigFunction('asset', function($value){
 			return $value;
 		}));
-		$twig->addFunction(new TwigFunction('path', function($value, $data, $absolute = false){
-			$path = $data['path'];
-			if($absolute){
-				$path = Demo::getHost() . $path;
-			}
-			return $path;
-		}));
 		$twig->addExtension(new DebugExtension());
 		$twig->enableDebug();
 		$wiki = new Wiki([
@@ -60,6 +53,9 @@ class Demo{
 		]);
 		$wiki->addPlugin($wsite);
 		$wiki->addPlugin(new Blog($wsite, $conf));
+		$twig->addFunction(new TwigFunction('path', function($value, $data, $absolute = false) use($wsite){
+			return $wsite->getRoute($data['path'], null, $absolute);
+		}));
 		return $wsite;
 	}
 	static public function getHost(){
