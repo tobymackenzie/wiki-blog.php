@@ -26,6 +26,7 @@
 		"tjm/wiki-site": "^0"
 	},
 	"require-dev": {
+		"monolog/monolog": "^3",
 		"symfony/browser-kit": "^5.4|^6.4",
 		"tjm/dev": "*"
 	}

@@ -1,26 +1,26 @@
 <?php
 namespace TJM\WikiBlog\Tests\Src;
+use Monolog\Logger;
+use Monolog\Handler\NullHandler;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Router as Base;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RouterInterface;
 
-class Router implements RouterInterface{
-	protected RouteCollection $c;
-	protected RequestContext $context;
+class Router extends Base{
 	public function __construct(){
-		$this->c = new RouteCollection();
-		$this->c->add('tjm_wiki', new Route('{path}', ['controller'=> 'TJM\WikiSite\WikiSite::viewAction']));
-	}
-	public function getRouteCollection(): RouteCollection{ return $this->c; }
-	public function match(string $pathinfo): array{}
-	public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string{
-		$path = $parameters['path'];
-		if($referenceType === true || $referenceType === self::ABSOLUTE_URL){
-			$path = Demo::getHost() . $path;
+		$this->collection = new RouteCollection();
+		$this->collection->add('tjm_wiki', new Route('{path}', ['controller'=> 'TJM\WikiSite\WikiSite::viewAction'], ['path'=> '.*']));
+		$fullHost = Demo::getHost();
+		$hostBits = explode(':', $fullHost, 2);
+		$host = $hostBits[1];
+		if(substr($host, 0, 2) === '//'){
+			$host = substr($host, 2);
 		}
-		return $path;
+		$this->context = new RequestContext('', 'GET', $host, $hostBits[0]);
+		$this->logger = new Logger('null');
+		$this->logger->pushHandler(new NullHandler());
+		$this->setOptions([]);
+		$this->defaultLocale = 'en';
 	}
-	public function setContext(RequestContext $context): void{ $this->context = $context; }
-	public function getContext(): RequestContext{ return $this->context; }
 }
