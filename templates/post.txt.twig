@@ -29,7 +29,7 @@
 {% if postsCount > 0 %}
 {{post.getExcerpt(postsCount > 20)|trim|raw}}
 
-<{{path(wikiRoute, {path: post.path}, true)}}>
+<{{post.url}}>
 
 --------------------------------------------
 

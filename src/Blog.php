@@ -423,7 +423,8 @@ class Blog extends Plugin{
 			'categoryPath'=> $this->getCategoryPath(),
 			'mediaPath'=> $this->getMediaPath(),
 			'tagPath'=> $this->getTagPath(),
-			'path'=> $path,
+			'path'=> $this->site->getRoute($path),
+			'url'=> $this->site->getRoute($path, null, UrlGeneratorInterface::ABSOLUTE_URL),
 			'file'=> $file,
 			'thumbnail'=> function($post) use($self){
 				$imagePath = $post->getImagePath();

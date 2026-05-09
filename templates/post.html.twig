@@ -9,14 +9,14 @@
 {%		if postsCount == 0 %}
 		<h1 class="postHeading p-name">{{post.name}}</h1>
 {%		else %}
-		<h2 class="postHeading p-name"><a class="postHeadingAction u-url" href="{{path(wikiRoute, {path: post.path})}}">{{post.name}}</a></h2>
+		<h2 class="postHeading p-name"><a class="postHeadingAction u-url" href="{{post.path}}">{{post.name}}</a></h2>
 {%		endif %}
 {%	endif %}
 	</header>
 {% endif %}
 	<header class="postMeta">
 		<div class="postMetaMain">
-			{% if post.nameIsId and postsCount > 0 %}<h2 class="postHeading"><a class="permalink u-url" href="{{path(wikiRoute, {path: post.path})}}" title="Post {{post.permalinkTitle}}" rel="bookmark">{% endif %}
+			{% if post.nameIsId and postsCount > 0 %}<h2 class="postHeading"><a class="permalink u-url" href="{{post.path}}" title="Post {{post.permalinkTitle}}" rel="bookmark">{% endif %}
 				<time class="dt-published postTime" datetime="{{post.date|date('Y-m-d H:i')}}" pubdate="pubdate">{{post.date|date(dateFormat)}}</time>
 			{% if post.nameIsId and postsCount > 0 %}</a></h2>{% endif %}
 {% if post.terms is defined %}
@@ -25,7 +25,7 @@
 				<span class="postTagsList">
 {%	for tag in post.terms %}
 {%		if postsCount == 0 %}
-					<span class="postTag"><a class="postTagAction p-category" href="{{path(wikiRoute, {path: tag.url})}}" rel="tag">{{tag.name}}</a></span>
+					<span class="postTag"><a class="postTagAction p-category" href="{{tag.url}}" rel="tag">{{tag.name}}</a></span>
 {%		else %}
 					<span class="postTag p-category" rel="tag">{{tag.name}}</span>
 {%		endif %}
@@ -35,7 +35,7 @@
 {% endif %}
 		</div>
 {% if postsCount == 0 %}
-		<div><a class="postPermalink permalink u-url" href="{{path(wikiRoute, {path: post.path})}}" title="Permalink to {{post.permalinkTitle}}" rel="bookmark">Permalink</a></div>
+		<div><a class="postPermalink permalink u-url" href="{{post.path}}" title="Permalink to {{post.permalinkTitle}}" rel="bookmark">Permalink</a></div>
 {% endif %}
 	</header>
 	<div class="postContent {{postsCount == 0 ? 'e-content' : 'p-summary'}}">
@@ -45,7 +45,7 @@
 		{{post.content|raw}}
 {% endif %}
 {% if postsCount > 0 and post.hasMore %}
-		<a class="more-link" href="{{path(wikiRoute, {path: post.path})}}">Continue reading <span class="sro"> post "{{post.name}}"</span></a>
+		<a class="more-link" href="{{post.path}}">Continue reading <span class="sro"> post "{{post.name}}"</span></a>
 {% endif %}
 	</div>
 	<hr />

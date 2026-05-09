@@ -23,6 +23,7 @@ class Post{
 	protected ?string $permalinkTitle = null;
 	protected $thumbnail = null;
 	protected array $terms = [];
+	protected ?string $url = null;
 	//--paths
 	protected string $blogPath = '/blog';
 	protected string $categoryPath = '/blog/category';
@@ -240,6 +241,12 @@ class Post{
 	}
 	public function getTerms(){
 		return $this->terms;
+	}
+	public function getUrl(){
+		return $this->url;
+	}
+	public function setUrl(string $val){
+		$this->url = $val;
 	}
 
 	//--helpers
