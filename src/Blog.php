@@ -215,19 +215,16 @@ class Blog extends Plugin{
 							$name = (new DateTime($event->getExtra('blogYear') . $event->getExtra('blogMonth') . $event->getExtra('blogDay')))->format('F j, Y');
 							$event->setData('relNext', $this->getAdjacentDateRelNav($event->getExtra('blogYear'), $event->getExtra('blogMonth'), $event->getExtra('blogDay')));
 							$event->setData('relPrev', $this->getAdjacentDateRelNav($event->getExtra('blogYear'), $event->getExtra('blogMonth'), $event->getExtra('blogDay'), true));
-							$event->setData('robots', 'noindex, follow');
 						break;
 						case 'month':
 							$name = (new DateTime($event->getExtra('blogYear') . $event->getExtra('blogMonth') . '01'))->format('F Y');
 							$event->setData('relNext', $this->getAdjacentDateRelNav($event->getExtra('blogYear'), $event->getExtra('blogMonth'), null));
 							$event->setData('relPrev', $this->getAdjacentDateRelNav($event->getExtra('blogYear'), $event->getExtra('blogMonth'), null, true));
-							$event->setData('robots', 'noindex, follow');
 						break;
 						case 'year':
 							$name = $event->getExtra('blogYear');
 							$event->setData('relNext', $this->getAdjacentDateRelNav($event->getExtra('blogYear')));
 							$event->setData('relPrev', $this->getAdjacentDateRelNav($event->getExtra('blogYear'), null, null, true));
-							$event->setData('robots', 'noindex, follow');
 						break;
 						case 'tag':
 							$name = $event->getExtra('blogTag');
@@ -238,7 +235,6 @@ class Blog extends Plugin{
 								$event->setFile($cat->getFile());
 								$name = $cat->getName();
 								$content = $cat->getContent();
-								$event->setData('robots', 'noindex, follow');
 							}else{
 								throw new NotFoundHttpException();
 							}
@@ -252,9 +248,6 @@ class Blog extends Plugin{
 						break;
 						default:
 							$name = ucwords($type);
-							if($type !== 'categories'){
-								$event->setData('robots', 'noindex, follow');
-							}
 						break;
 					}
 					switch($type){
@@ -264,6 +257,9 @@ class Blog extends Plugin{
 						default:
 							$name .= ' posts';
 							$title = $name . ' - ' . $this->name;
+							if($type !== 'category'){
+								$event->setData('robots', 'noindex, follow');
+							}
 						break;
 					}
 					if(!empty($content)){
