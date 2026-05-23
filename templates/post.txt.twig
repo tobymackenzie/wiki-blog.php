@@ -1,5 +1,5 @@
 {{-post.build()-}}
-{%- if not post.nameIsId or post.thumbnail is not empty or postsCount == 0 -%}
+{%- if not post.nameIsId or post.imagePath is not empty or postsCount == 0 -%}
 {%-	if not post.nameIsId or postsCount == 0 -%}
 {%-		if postsCount == 0 -%}
 {{post.name}}

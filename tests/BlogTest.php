@@ -12,6 +12,7 @@ class BlogTest extends TestCase{
 		'/blog/2026'=> '2026 posts',
 		'/blog/2026/01'=> 'January 2026 posts',
 		'/blog/2026/01/01'=> 'January 1, 2026 posts',
+		'/blog/2025/06/07/wiki'=> 'This is the wiki',
 		'/blog/2026/01/01/foo'=> 'Lorem ipsum dolor sit amet',
 		'/blog/2003/07/31/9'=> 'My first posting',
 		'/blog/category/me'=> 'The life and times of Me',
