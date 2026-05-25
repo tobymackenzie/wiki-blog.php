@@ -606,13 +606,16 @@ class Blog extends Plugin{
 		foreach($this->wiki->listDir(pathinfo($imagePath, PATHINFO_DIRNAME), Wiki::LIST_WIKIPATH, $fname . '*') as $file){
 			$fileFname = pathinfo($file, PATHINFO_FILENAME);
 			if(preg_match(':^' . $fname . '\-([\d]+)x([\d]+)$:', $fileFname, $matches)){
-				if($matches[1] > 700){
-					break;
-				}
-				$opts[] = $file;
+				$opts[(int) $matches[1]] = $file;
 			}
 		}
 		if(!empty($opts)){
+			ksort($opts);
+			foreach($opts as $key=> $opt){
+				if((int) $key >= 620){
+					return $opt;
+				}
+			}
 			return end($opts);
 		}
 	}
