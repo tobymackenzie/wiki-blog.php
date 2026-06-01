@@ -31,6 +31,7 @@ class Blog extends Plugin{
 	// const POST_PATH_TO_CAT = 4;
 
 	protected string $name = 'Blog';
+	protected ?string $shortName;
 	protected ?string $description = null;
 	protected ?int $feedCount = null;
 	protected int $indexCount = 12;
@@ -65,6 +66,10 @@ class Blog extends Plugin{
 		$this->site = $site;
 		$this->wiki = $site->getWiki();
 	}
+	protected function getShortName(){
+		return $this->shortName ?? $this->name;
+	}
+	//--paths
 	protected function getCategoryPath(){
 		if(substr($this->categoryPath, 0, 1) !== '/' && strpos($this->categoryPath, '://') === false){
 			return $this->blogPath . '/' . $this->categoryPath;
@@ -256,7 +261,7 @@ class Blog extends Plugin{
 						break;
 						default:
 							$name .= ' posts';
-							$title = $name . ' - ' . $this->name;
+							$title = $name . ' - ' . $this->getShortName();
 							if($type !== 'category'){
 								$event->setData('robots', 'noindex, follow');
 							}
@@ -285,7 +290,7 @@ class Blog extends Plugin{
 				case 'terms':
 					throw new NotFoundHttpException();
 					//-!! not implemented
-					$title = $name . ' - ' . $this->name;
+					$title = $name . ' - ' . $this->getShortName();
 					switch($type){
 						case 'categories':
 						break;
@@ -322,7 +327,7 @@ class Blog extends Plugin{
 			}
 		}
 		if(empty($event->getData('title')) && $event->getName()){
-			$event->setData('title', $event->getName() . " - {$this->name}");
+			$event->setData('title', $event->getName() . " - {$this->getShortName()}");
 		}
 
 		$postsCount = $isDetail ? 0 : count($event->getData('posts'));
