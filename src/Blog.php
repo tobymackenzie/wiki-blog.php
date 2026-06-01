@@ -286,6 +286,7 @@ class Blog extends Plugin{
 						//--prevent double converting
 						$event->setContent(' ');
 						$event->setName($post->getName());
+						$event->setData('title', $post->getName() . ' - ' . $this->getShortName());
 					}
 				break;
 				case 'terms':
