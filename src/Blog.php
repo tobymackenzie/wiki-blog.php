@@ -285,6 +285,7 @@ class Blog extends Plugin{
 						$event->setData('relNext', $this->getAdjacentPostRelNav($post, true));
 						//--prevent double converting
 						$event->setContent(' ');
+						$event->setName($post->getName());
 					}
 				break;
 				case 'terms':
