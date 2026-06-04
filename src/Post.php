@@ -62,7 +62,6 @@ class Post{
 					$this->nameIsId = true;
 				}else{
 					$this->name = ucwords($meta['name']);
-					$this->nameIsId = true;
 				}
 			}else{
 				$fileName = pathinfo($this->file->getPath(), PATHINFO_FILENAME);
