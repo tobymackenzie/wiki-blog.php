@@ -447,7 +447,7 @@ class Blog extends Plugin{
 		}
 		return $post;
 	}
-	protected function getPost(?string $path = null, ?string $pagePath = null, ?string $ext = null){
+	public function getPost(?string $path = null, ?string $pagePath = null, ?string $ext = null){
 		if($pagePath && $this->wiki->hasPage($pagePath)){
 			$file = $this->wiki->getPage($pagePath);
 			$usePath = $pagePath;
