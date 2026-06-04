@@ -1,7 +1,9 @@
 <?php
 namespace TJM\WikiBlog\Tests;
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use TJM\Wiki\Wiki;
+use TJM\WikiSite\WikiSite;
 use TJM\WikiBlog\Blog;
 use TJM\WikiBlog\Tests\Src\Demo;
 
@@ -37,6 +39,48 @@ class BlogTest extends TestCase{
 			$this->assertStringContainsString('wiki://' . $path, $response->getContent());
 			$this->assertStringContainsString($expect, $response->getContent());
 		}
+	}
+	public function testPublish(){
+		$path = __DIR__ . '/tmp';
+		mkdir($path);
+		$wiki = new Wiki(['path'=> $path]);
+		$site = new WikiSite();
+		$wiki->addPlugin($site);
+		$blog = new Blog($site);
+		$wiki->addPlugin($blog);
+		mkdir($path . '/blog');
+		mkdir($path . '/blog/drafts');
+		$date = new DateTime();
+
+		//--publish files
+		$fileFoo = $path . '/blog/drafts/foo.md';
+		file_put_contents($fileFoo, 'This is a test');
+		$blog->publish('foo.md');
+		$this->assertEquals("Add blog post 'foo'\n", shell_exec('git -C ' . escapeshellarg($path) . ' log --pretty="%s" -n 1'));
+		$fileFoo = $path . '/blog/drafts/draft.md';
+		file_put_contents($fileFoo, 'This is another test');
+		$blog->publish('draft.md');
+		$this->assertEquals("Add blog post '2'\n", shell_exec('git -C ' . escapeshellarg($path) . ' log --pretty="%s" -n 1'));
+
+		//--check posts
+		$post = $blog->getPost('/blog/' . $date->format('Y/m/d/') . 'foo.md');
+		$post->build();
+		$this->assertEquals('1', $post->getId());
+		$this->assertEquals('Foo', $post->getName());
+		$this->assertEquals($date->format('Ymd'), $post->getDate()->format('Ymd'));
+		$this->assertFalse($post->getNameIsId(), 'Post with slug should not consider name as ID');
+		$this->assertStringContainsString('This is a test', $post->getContent());
+
+		$post = $blog->getPost('/blog/' . $date->format('Y/m/d/') . '2.md');
+		$post->build();
+		$this->assertEquals('2', $post->getId());
+		$this->assertEquals('#2', $post->getName());
+		$this->assertEquals($date->format('Ymd'), $post->getDate()->format('Ymd'));
+		$this->assertTrue($post->getNameIsId(), 'ID named post should consider name is ID');
+		$this->assertStringContainsString('This is another test', $post->getContent());
+
+		//--clean
+		shell_exec('rm -rf ' . escapeshellarg($path));
 	}
 	public function testFeedResponse(){
 		$wsite = $this->getWikiSite();

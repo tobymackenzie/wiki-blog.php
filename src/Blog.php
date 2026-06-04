@@ -36,6 +36,7 @@ class Blog extends Plugin{
 	protected ?int $feedCount = null;
 	protected int $indexCount = 12;
 	protected int $maxCount = 100;
+	protected ?string $timezone = null;
 	protected WikiSite $site;
 	protected ?Wiki $wiki;
 	//--paths / urls
@@ -75,6 +76,9 @@ class Blog extends Plugin{
 			return $this->blogPath . '/' . $this->categoryPath;
 		}
 		return $this->categoryPath;
+	}
+	public function getDraftsPath(){
+		return $this->blogPath . '/drafts';
 	}
 	protected function getFeedPath(){
 		if(substr($this->feedPath, 0, 1) !== '/' && strpos($this->feedPath, '://') === false){
@@ -389,7 +393,7 @@ class Blog extends Plugin{
 			$path = $this->blogPath;
 		}
 		if(!isset($find)){
-			$find .= " -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->commentsPath}/*' -not -path '*{$this->mentionsPath}/*'";
+			$find .= " -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->getDraftsPath()}/*' -not -path '*{$this->commentsPath}/*' -not -path '*{$this->mentionsPath}/*'";
 		}
 		if(!isset($sort)){
 			$sort = Wiki::SORT_DESC | Wiki::SORT_DATE;
@@ -589,6 +593,91 @@ class Blog extends Plugin{
 		}
 		return;
 	}
+
+	//--drafts
+	public function publish($file, $meta = []){
+		if($this->timezone){
+			date_default_timezone_set($this->timezone);
+		}
+		$date = new DateTime();
+		//--remove millisecond precision from date
+		$date->setTime(
+			(int) $date->format('G'),
+			(int) $date->format('i'),
+			(int) $date->format('s')
+		);
+		$destFolder = $this->blogPath . $date->format('/Y/m/d');
+		$destFolderFullPath = $this->wiki->getPath() . $destFolder;
+		if(!file_exists($destFolderFullPath)){
+			$this->wiki->runShell('mkdir -p ' . escapeshellarg($destFolderFullPath));
+		}
+		if(is_string($file)){
+			$path = $file;
+			if(file_exists($file) && is_writable($file)){
+				$fileName = pathinfo($path, PATHINFO_BASENAME);
+				$path = $this->getDraftsPath() . '/' . 'tmp' . $date->format('YmdHis');
+				$fullPath = $destFolderFullPath . '/' . $fileName;
+				$this->run('mv ' . escapeshellarg($file) . ' ' . escapeshellarg($path));
+			}else{
+				$path = $file;
+				if(substr($path, 0, 1) !== '/'){
+					$path = '/' . $path;
+				}
+				$path = $this->getDraftsPath() . $path;
+			}
+			$file = $this->wiki->getFile($path);
+		}else{
+			$path = $file->getPath();
+		}
+		$fullPath = $this->wiki->getFilePath($path);
+		if(!file_exists($fullPath)){
+			throw new Exception("publish: File not at expected path {$fullPath}");
+		}
+		if(empty($fileName)){
+			$fileName = pathinfo($path, PATHINFO_BASENAME);
+		}
+		//--load content, meta data, build needed values
+		$file->getContent();
+		$file->getMeta();
+		$file->setMeta('date', $date);
+		$file->setMetaIfUnset($meta);
+		if($file->getMeta('id')){
+			$id = $file->getMeta('id');
+		}else{
+			$prev = $this->getLastPost();
+			$id = $prev ? (int) $prev->getId() + 1 : 1;
+			$file->setMeta('id', $id);
+		}
+		if($file->getMeta('name')){
+			$slug = $file->getMeta('name');
+			$fileName = $slug . '.md';
+		}else{
+			$slug = pathinfo($path, PATHINFO_FILENAME);
+			//-- need some value that forces use of id as name
+			if($slug === 'draft' || $slug === '0'){
+				$slug = $id;
+				$fileName = $slug . '.md';
+			}
+			$file->setMeta('name', $slug);
+		}
+		$destPath = $destFolder . '/' . $fileName;
+		$file->setMetaIfUnset('guid', 'https://' . $this->site->getDomain() . $destPath);
+		$destFullPath = $this->wiki->getFilePath($destPath);
+		if($fullPath !== $destFullPath){
+			if(file_exists($destFullPath)){
+				throw new Exception("publish: destination file path '{$destFullPath}' already exists");
+			}
+			$this->wiki->runShell('mv ' . escapeshellarg($fullPath) . ' ' . escapeshellarg($destFullPath));
+			$file->setPath($destPath);
+		}
+		$this->wiki->writeFile($file);
+		$this->wiki->commitFile($file, "Add blog post '{$slug}'");
+		if(shell_exec("git -C " . escapeshellarg($destFolderFullPath) . " rev-parse --abbrev-ref @{upstream} 2> /dev/null")){
+			$this->wiki->runGit('push');
+		}
+		// …build: fire event
+	}
+
 	//--dates
 	protected function getCurrentDay(){
 		if(empty($this->day)){
