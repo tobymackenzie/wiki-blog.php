@@ -461,6 +461,10 @@ class Blog extends Plugin{
 		}
 		return $this->createPost($file, $usePath, $ext);
 	}
+	protected function getLastPost(){
+		$posts = $this->getPosts('md', $this->blogPath, null, null, null, 1);
+		return $posts ? $posts[0] : null;
+	}
 	//--relnav
 	protected function getDateRelNav(int $year, ?int $month = null, ?int $day = null){
 		$file = $this->blogPath . '/' . $year;
