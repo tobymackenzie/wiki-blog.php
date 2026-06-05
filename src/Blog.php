@@ -772,4 +772,24 @@ class Blog extends Plugin{
 		$response->headers->set('Content-Type', 'application/xml');
 		return $response;
 	}
+
+	//==terms (cats, tags)
+	public function getCatSlugs(){
+		$cats = [];
+		foreach(glob($this->wiki->getPath() . $this->getCategoryPath() . '/*.md', ) as $file){
+			$cats[] = pathinfo($file, PATHINFO_FILENAME);
+		}
+		return $cats;
+	}
+	public function getTagSlugs(){
+		$tags = [];
+		if(($file = fopen($this->wiki->getPath() . $this->getTagPath() . '.csv', 'r')) !== false){
+			//--skip first line
+			fgetcsv($file, 1000);
+			while(($data = fgetcsv($file, 1000)) !== false){
+				$tags[] = $data[0];
+			}
+		}
+		return $tags;
+	}
 }
