@@ -790,6 +790,7 @@ class Blog extends Plugin{
 				$tags[] = $data[0];
 			}
 		}
+		fclose($file);
 		return $tags;
 	}
 }
