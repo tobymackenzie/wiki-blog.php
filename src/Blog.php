@@ -726,7 +726,7 @@ class Blog extends Plugin{
 		if(file_exists($path)){
 			return new BinaryFileResponse($path);
 		}
-		throw NotFoundHttpException();
+		throw new NotFoundHttpException();
 	}
 	protected function getRssFeedResponse(){
 		$doc = new DomDocument('1.0', 'utf-8');
