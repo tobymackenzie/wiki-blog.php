@@ -1,0 +1,13 @@
+{% extends shellTemplate ?? '@TJMWikiSite/shell.txt.twig' %}
+{% block content %}
+{{name}}
+====================
+
+{% if content is not empty %}
+{{content|trim|raw}}
+
+--------------------------------------------
+
+{% endif %}
+{% endblock content %}
+

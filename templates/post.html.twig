@@ -50,20 +50,13 @@
 	</div>
 	<hr />
 {% if postsCount == 0 %}
-		{{include(blogRelNavTemplate ?? '@TJMWikiBlog/relNav.html.twig')}}
+{%	if post.hasMentions or email is not empty %}
+	<aside class="postComments comments postAside" id="comments">
+		{% if post.hasMentions %}<a href="{{post.mentionsUrl}}">Replies / Mentions</a>{% endif %}
+		{% if email is not empty %}<p>To reply to this post, <a href="mailto:{{email}}">email me</a>.</p>{% endif %}
+		<hr />
+	</aside>
+{%	endif %}
+	{{include(blogRelNavTemplate ?? '@TJMWikiBlog/relNav.html.twig')}}
 {% endif %}
 </article>
-{#-!
-{% if postsCount == 0 %}
-seems like it should be in article
-as separate page, {postUrl}/comments
-if($postType === 'single' || $postType === 'page'){
-	comments_template('', true);
-}
-eg
-<aside class="postComments comments postAside" id="comments">
-	<p>To reply to this post,  post on your blog and send a pingback, or <a href="mailto:admin@tobymackenzie.com">email me</a>.</p>
-	<hr />
-</aside>
-{% endif %}
-#}

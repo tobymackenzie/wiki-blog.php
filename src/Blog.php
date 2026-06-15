@@ -30,6 +30,8 @@ class Blog extends Plugin{
 	// eg /cat-name/post-name
 	// const POST_PATH_TO_CAT = 4;
 
+	//--email for post replies
+	protected ?string $email = null;
 	protected string $name = 'Blog';
 	protected ?string $shortName;
 	protected ?string $description = null;
@@ -43,7 +45,6 @@ class Blog extends Plugin{
 	protected string $blogPath = '/blog';
 	//-! if categoryPath or tagPath empty, will need smarter logic to figure out what non-year strings match
 	protected string $categoryPath = 'category';
-	protected string $commentsPath = 'comments';
 	//-! protected int $detailPathType = self::POST_PATH_TO_MONTH;
 	protected string $feedPath = 'feed';
 	protected string $mediaPath = 'media';
@@ -52,6 +53,7 @@ class Blog extends Plugin{
 	//--templates
 	protected ?string $detailTemplate = '@TJMWikiBlog/detail';
 	protected ?string $listTemplate = '@TJMWikiBlog/list';
+	protected ?string $mentionsTemplate = '@TJMWikiBlog/mentions';
 	protected ?string $postTemplate = '@TJMWikiBlog/post';
 	//--cache
 	protected ?int $day = null;
@@ -153,6 +155,15 @@ class Blog extends Plugin{
 					'blogYear'=> $matches[1],
 					'blogMonth'=> $matches[2],
 					'blogDay'=> $matches[3],
+				]);
+			}elseif(preg_match(":^/([\d]{2,4})/?([\d]{2})?/?([\d]{2})?/([\w\-]+)/mentions(\.[\w]+)?/?$:i", $subPath, $matches)){
+				$generalType = 'mentions';
+				$type = 'mentions';
+				$event->setExtra([
+					'blogYear'=> $matches[1],
+					'blogMonth'=> $matches[2],
+					'blogDay'=> $matches[3],
+					'blogPost'=> $matches[4],
 				]);
 			}elseif(preg_match(":^/([\d]{2,4})/?([\d]{2})?/?([\d]{2})?/([\w\-\.]+)/?$:i", $subPath, $matches)){
 				$generalType = 'detail';
@@ -279,12 +290,38 @@ class Blog extends Plugin{
 					$event->setData('title', $title);
 					$event->setExtra('isBlog', true);
 				break;
+				case 'mentions':
+					$postPath = $this->blogPath . '/' . $event->getExtra('blogYear');
+					if($event->getExtra('blogMonth')){
+						$postPath .= '/' . $event->getExtra('blogMonth');
+					}
+					if($event->getExtra('blogDay')){
+						$postPath .= '/' . $event->getExtra('blogDay');
+					}
+					$postPath .= '/' . $event->getExtra('blogPost');
+					$post = $this->getPost(null, $postPath);
+					if($post && $post->getFile()){
+						$pagePath = pathinfo($path, PATHINFO_DIRNAME) . '/' . pathinfo($path, PATHINFO_FILENAME);
+						if($this->wiki->hasPage($pagePath)){
+							$file = $this->wiki->getPage($pagePath);
+							$event->setFile($file);
+							$event->setData('post', $post);
+							$event->setExtra('isBlog', true);
+							//--prevent double converting
+							$event->setName($post->getName() . ' Mentions');
+							$event->setData('title', $event->getName() . ' - ' . $this->getShortName());
+						}
+					}
+				break;
 				case 'detail':
 					$post = $this->getPost($path, $event->getPagePath(), $ext);
 					if($post && $post->getFile()){
 						$event->setFile($post->getFile());
 						$event->setExtra('post', $post);
 						$event->setExtra('isBlog', true);
+						if($this->email){
+							$event->setData('email', $this->email);
+						}
 						$event->setData('relPrev', $this->getAdjacentPostRelNav($post));
 						$event->setData('relNext', $this->getAdjacentPostRelNav($post, true));
 						//--prevent double converting
@@ -322,21 +359,27 @@ class Blog extends Plugin{
 		}
 		//-# is single in WP parlance
 		$isDetail = $type === 'detail';
-		if($isDetail){
-			$post = $event->getExtra('post');
-			if($this->detailTemplate){
-				$event->setTemplate("{$this->detailTemplate}.{$ext}.twig");
-			}
-		}else{
-			if($this->listTemplate){
-				$event->setTemplate("{$this->listTemplate}.{$ext}.twig");
-			}
+		switch($type){
+			case 'detail':
+				$post = $event->getExtra('post');
+				if($this->detailTemplate){
+					$event->setTemplate("{$this->detailTemplate}.{$ext}.twig");
+				}
+			break;
+			case 'mentions':
+				$event->setTemplate("{$this->mentionsTemplate}.{$ext}.twig");
+			break;
+			default:
+				if($this->listTemplate){
+					$event->setTemplate("{$this->listTemplate}.{$ext}.twig");
+				}
+			break;
 		}
 		if(empty($event->getData('title')) && $event->getName()){
 			$event->setData('title', $event->getName() . " - {$this->getShortName()}");
 		}
 
-		$postsCount = $isDetail ? 0 : count($event->getData('posts'));
+		$postsCount = $isDetail || $type === 'mentions' ? 0 : count($event->getData('posts'));
 		$event->setData([
 			'postsCount'=> $postsCount,
 			'postTemplate'=> "{$this->postTemplate}.{$ext}.twig",
@@ -393,7 +436,12 @@ class Blog extends Plugin{
 			$path = $this->blogPath;
 		}
 		if(!isset($find)){
-			$find .= " -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->getDraftsPath()}/*' -not -path '*{$this->commentsPath}/*' -not -path '*{$this->mentionsPath}/*'";
+			//-# max depth to ignore mentions.md mentions file.  will have problems with multiple post depths
+			$maxDepth = 4;
+			if(strpos($path, $this->blogPath) === 0){
+				$maxDepth -= count(explode('/', trim($path, '/ '))) - 1;
+			}
+			$find .= " -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->getDraftsPath()}/*' -not -path '*{$this->mentionsPath}/*' -maxdepth {$maxDepth}";
 		}
 		if(!isset($sort)){
 			$sort = Wiki::SORT_DESC | Wiki::SORT_DATE;
@@ -403,7 +451,7 @@ class Blog extends Plugin{
 		}
 		return $this->wiki->getPages($path, $find, $grep, $sort, $limit);
 	}
-	protected function getPosts(string $ext, ?string $path = null, ?string $find = null, $grep = null, ?int $sort = null, ?int $limit = null){
+	public function getPosts(string $ext, ?string $path = null, ?string $find = null, $grep = null, ?int $sort = null, ?int $limit = null){
 		$pages = $this->getPages($path, $find, $grep, $sort, $limit);
 		$posts = [];
 		foreach($pages as $page){
@@ -441,6 +489,16 @@ class Blog extends Plugin{
 				return null;
 			},
 		]);
+		$basePath = pathinfo($file->getPath(), PATHINFO_DIRNAME) . '/' . pathinfo($file->getPath(), PATHINFO_FILENAME);
+		$mentionsPagePath = $basePath . '/' . $this->mentionsPath;
+		$mentionsFilePath = $mentionsPagePath . '.md';
+		if($this->wiki->hasFile($mentionsFilePath)){
+			if($ext && $ext !== 'html'){
+				$mentionsPagePath .= '.' . $ext;
+			}
+			$mentionsPagePath = '/' . $mentionsPagePath;
+			$post->setMentionsUrl($this->site->getRoute($mentionsPagePath, null, UrlGeneratorInterface::ABSOLUTE_URL));
+		}
 		if($ext && $this->site->canConvertFile($post->getFile(), $ext)){
 			$site = $this->site;
 			$post->setContent(function() use($post, $site, $ext){

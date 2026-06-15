@@ -1,0 +1,15 @@
+{% extends '@TJMWikiBlog/shell.html.twig' %}
+{% block content %}
+<article>
+	<header class="a--mhead">
+		<h1>{{name}}</h1>
+	</header>
+{% if content is not empty %}
+	<div>{{content|raw}}</div>
+{% endif %}
+{% if post is not empty and post.path %}
+	<a href="{{post.path}}">&lt; Back to post</a>
+{% endif %}
+</article>
+{% endblock content %}
+

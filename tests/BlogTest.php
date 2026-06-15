@@ -40,6 +40,15 @@ class BlogTest extends TestCase{
 			$this->assertStringContainsString($expect, $response->getContent());
 		}
 	}
+	//-# also makes sure mentions aren't included in list
+	public function testRelNav(){
+		$site = $this->getWikiSite();
+		$response = $site->viewAction('/blog/2003/07/31/9');
+		$this->assertStringContainsString('Next post: Other name', $response->getContent());
+		$response = $site->viewAction('/blog/2025/01/01/121');
+		$this->assertStringContainsString('Previous post: First Post', $response->getContent());
+		$this->assertStringContainsString('Next post: #1211', $response->getContent());
+	}
 	public function testPublish(){
 		$path = __DIR__ . '/tmp';
 		mkdir($path);
@@ -101,6 +110,25 @@ class BlogTest extends TestCase{
 			$this->assertEquals(302, $response->getStatusCode());
 			$this->assertEquals($path, $response->getTargetUrl());
 		}
+	}
+
+	//--mentions
+	public function testMentions(){
+		$path = __DIR__ . '/resources';
+		$wiki = new Wiki(['path'=> $path]);
+		$site = new WikiSite();
+		$wiki->addPlugin($site);
+		$blog = new Blog($site);
+		$wiki->addPlugin($blog);
+		$posts = $blog->getPosts('xhtml');
+		//--get posts shouldn't get mentions page
+		$this->assertEquals(2, count($posts));
+		//--oldest post should have mentions
+		$post = $posts[0];
+		$this->assertEmpty($post->getMentionsUrl());
+		$post = $posts[1];
+		$this->assertEquals('/blog/2003/07/31/123/mentions.xhtml', $post->getMentionsUrl());
+		// $this->assertEquals(
 	}
 
 	//==setup
