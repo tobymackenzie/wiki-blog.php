@@ -441,7 +441,7 @@ class Blog extends Plugin{
 			if(strpos($path, $this->blogPath) === 0){
 				$maxDepth -= count(explode('/', trim($path, '/ '))) - 1;
 			}
-			$find .= " -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->getDraftsPath()}/*' -not -path '*{$this->mentionsPath}/*' -maxdepth {$maxDepth}";
+			$find .= " -maxdepth {$maxDepth} -not -path '*{$this->getCategoryPath()}/*' -not -path '*{$this->getDraftsPath()}/*' -not -path '*{$this->mentionsPath}/*'";
 		}
 		if(!isset($sort)){
 			$sort = Wiki::SORT_DESC | Wiki::SORT_DATE;
