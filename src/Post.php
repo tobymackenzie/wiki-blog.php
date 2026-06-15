@@ -1,6 +1,7 @@
 <?php
 namespace TJM\WikiBlog;
 use DateTime;
+use DateTimeZone;
 use TJM\Wiki\File;
 
 class Post{
@@ -255,6 +256,10 @@ class Post{
 		}else{
 			if(is_int($input)){
 				$date = new DateTime('@' . $input);
+				$tz = date_default_timezone_get();
+				if($tz !== 'UTC'){
+					$date->setTimezone(new DateTimeZone($tz));
+				}
 			}else{
 				$date = new DateTime($input);
 			}

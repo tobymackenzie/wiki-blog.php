@@ -90,7 +90,7 @@ class BlogTest extends TestCase{
 		$this->assertStringContainsString('<rss version="2.0">', $response->getContent());
 		$this->assertStringContainsString('<item>', $response->getContent());
 		$this->assertStringContainsString('<p>Lorem ipsum dolor sit amet', $response->getContent());
-		$this->assertStringContainsString('<pubDate>Sun, 05 Apr 2026 00:55:00 +0000</pubDate>', $response->getContent());
+		$this->assertStringContainsString('<pubDate>Sat, 04 Apr 2026 20:55:00 -0400</pubDate>', $response->getContent());
 		$this->assertStringContainsString('<guid isPermalink="false">https://www.tobymackenzie.com/blog/?p=129</guid>', $response->getContent());
 	}
 	public function testRemoveSlash(){
