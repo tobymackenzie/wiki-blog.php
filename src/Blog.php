@@ -308,7 +308,7 @@ class Blog extends Plugin{
 							$event->setData('post', $post);
 							$event->setExtra('isBlog', true);
 							//--prevent double converting
-							$event->setName($post->getName() . ' Mentions');
+							$event->setName($post->getName() . ' mentions');
 							$event->setData('title', $event->getName() . ' - ' . $this->getShortName());
 						}
 					}

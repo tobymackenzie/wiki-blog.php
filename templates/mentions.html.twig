@@ -1,6 +1,6 @@
 {% extends '@TJMWikiBlog/shell.html.twig' %}
 {% block content %}
-<article>
+<article class="postAside">
 	<header class="a--mhead">
 		<h1>{{name}}</h1>
 	</header>
@@ -8,7 +8,8 @@
 	<div>{{content|raw}}</div>
 {% endif %}
 {% if post is not empty and post.path %}
-	<a href="{{post.path}}">&lt; Back to post</a>
+	<hr />
+	<a href="{{post.path}}">&lt; From post '{{post.name}}'</a>
 {% endif %}
 </article>
 {% endblock content %}
