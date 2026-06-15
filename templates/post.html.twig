@@ -50,10 +50,10 @@
 	</div>
 	<hr />
 {% if postsCount == 0 %}
-{%	if post.hasMentions or email is not empty %}
+{%	if post.hasMentions or email|default %}
 	<aside class="postComments comments postAside" id="comments">
 		{% if post.hasMentions %}<a href="{{post.mentionsUrl}}">Replies / Mentions</a>{% endif %}
-		{% if email is not empty %}<p>To reply to this post, <a href="mailto:{{email}}">email me</a>.</p>{% endif %}
+		{% if email|default %}<p>To reply to this post, <a href="mailto:{{email}}">email me</a>.</p>{% endif %}
 		<hr />
 	</aside>
 {%	endif %}
