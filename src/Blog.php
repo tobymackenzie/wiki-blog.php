@@ -497,7 +497,7 @@ class Blog extends Plugin{
 				$mentionsPagePath .= '.' . $ext;
 			}
 			$mentionsPagePath = '/' . $mentionsPagePath;
-			$post->setMentionsUrl($this->site->getRoute($mentionsPagePath, null, UrlGeneratorInterface::ABSOLUTE_URL));
+			$post->setMentionsPath($this->site->getRoute($mentionsPagePath, null, UrlGeneratorInterface::ABSOLUTE_PATH));
 		}
 		if($ext && $this->site->canConvertFile($post->getFile(), $ext)){
 			$site = $this->site;

@@ -17,7 +17,7 @@ class Post{
 	protected ?string $id = null;
 	protected ?string $image = null;
 	protected ?string $imageAlt = null;
-	protected ?string $mentionsUrl = null;
+	protected ?string $mentionsPath = null;
 	protected ?DateTime $modified = null;
 	protected ?string $name = null;
 	protected bool $nameIsId = false;
@@ -188,13 +188,13 @@ class Post{
 		return $this->guid;
 	}
 	public function hasMentions(){
-		return (bool) $this->mentionsUrl;
+		return (bool) $this->mentionsPath;
 	}
-	public function getMentionsUrl(){
-		return $this->mentionsUrl;
+	public function getMentionsPath(){
+		return $this->mentionsPath;
 	}
-	public function setMentionsUrl(string $val){
-		$this->mentionsUrl = $val;
+	public function setMentionsPath(string $val){
+		$this->mentionsPath = $val;
 	}
 	public function getHasMore(){
 		if(!isset($this->hasMore)){

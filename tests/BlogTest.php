@@ -125,9 +125,9 @@ class BlogTest extends TestCase{
 		$this->assertEquals(2, count($posts));
 		//--oldest post should have mentions
 		$post = $posts[0];
-		$this->assertEmpty($post->getMentionsUrl());
+		$this->assertEmpty($post->getMentionsPath());
 		$post = $posts[1];
-		$this->assertEquals('/blog/2003/07/31/123/mentions.xhtml', $post->getMentionsUrl());
+		$this->assertEquals('/blog/2003/07/31/123/mentions.xhtml', $post->getMentionsPath());
 		// $this->assertEquals(
 	}
 
