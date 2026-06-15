@@ -4,13 +4,15 @@
 	<header class="a--mhead">
 		<h1>{{name}}</h1>
 	</header>
+	<div class="m--cont">
 {% if content is not empty %}
-	<div>{{content|raw}}</div>
+		<div>{{content|raw}}</div>
 {% endif %}
 {% if post is not empty and post.path %}
-	<hr />
-	<a href="{{post.path}}">&lt; From post '{{post.name}}'</a>
+		<hr />
+		<a href="{{post.path}}">&lt; From post '{{post.name}}'</a>
 {% endif %}
+	</div>
 </article>
 {% endblock content %}
 
