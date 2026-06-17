@@ -473,10 +473,22 @@ class Blog extends Plugin{
 			}
 		}
 		$self = $this;
+		$basePath = pathinfo($file->getPath(), PATHINFO_DIRNAME) . '/' . pathinfo($file->getPath(), PATHINFO_FILENAME);
 		$post = new Post([
 			'blogPath'=> $this->blogPath,
 			'categoryPath'=> $this->getCategoryPath(),
 			'mediaPath'=> $this->getMediaPath(),
+			'mentionsPath'=> function() use($self, $basePath, $ext){
+				$mentionsPagePath = $basePath . '/' . $self->mentionsPath;
+				$mentionsFilePath = $mentionsPagePath . '.md';
+				if($self->wiki->hasFile($mentionsFilePath)){
+					if($ext && $ext !== 'html'){
+						$mentionsPagePath .= '.' . $ext;
+					}
+					$mentionsPagePath = '/' . $mentionsPagePath;
+					return $self->site->getRoute($mentionsPagePath, null, UrlGeneratorInterface::ABSOLUTE_PATH);
+				}
+			},
 			'tagPath'=> $this->getTagPath(),
 			'path'=> $this->site->getRoute($path),
 			'url'=> $this->site->getRoute($path, null, UrlGeneratorInterface::ABSOLUTE_URL),
@@ -489,16 +501,6 @@ class Blog extends Plugin{
 				return null;
 			},
 		]);
-		$basePath = pathinfo($file->getPath(), PATHINFO_DIRNAME) . '/' . pathinfo($file->getPath(), PATHINFO_FILENAME);
-		$mentionsPagePath = $basePath . '/' . $this->mentionsPath;
-		$mentionsFilePath = $mentionsPagePath . '.md';
-		if($this->wiki->hasFile($mentionsFilePath)){
-			if($ext && $ext !== 'html'){
-				$mentionsPagePath .= '.' . $ext;
-			}
-			$mentionsPagePath = '/' . $mentionsPagePath;
-			$post->setMentionsPath($this->site->getRoute($mentionsPagePath, null, UrlGeneratorInterface::ABSOLUTE_PATH));
-		}
 		if($ext && $this->site->canConvertFile($post->getFile(), $ext)){
 			$site = $this->site;
 			$post->setContent(function() use($post, $site, $ext){

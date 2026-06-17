@@ -17,7 +17,7 @@ class Post{
 	protected ?string $id = null;
 	protected ?string $image = null;
 	protected ?string $imageAlt = null;
-	protected ?string $mentionsPath = null;
+	protected $mentionsPath = null;
 	protected ?DateTime $modified = null;
 	protected ?string $name = null;
 	protected bool $nameIsId = false;
@@ -188,12 +188,16 @@ class Post{
 		return $this->guid;
 	}
 	public function hasMentions(){
-		return (bool) $this->mentionsPath;
+		$mentionsPath = $this->getMentionsPath();
+		return !empty($mentionsPath);
 	}
 	public function getMentionsPath(){
+		if(!is_string($this->mentionsPath) && is_callable($this->mentionsPath)){
+			$this->mentionsPath = call_user_func($this->mentionsPath, $this);
+		}
 		return $this->mentionsPath;
 	}
-	public function setMentionsPath(string $val){
+	public function setMentionsPath($val){
 		$this->mentionsPath = $val;
 	}
 	public function getHasMore(){
