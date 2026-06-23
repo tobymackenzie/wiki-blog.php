@@ -460,6 +460,10 @@ class Blog extends Plugin{
 		return $posts;
 	}
 	protected function createPost(File $file, ?string $path = null, ?string $ext = null){
+		$cacheKey = 'blogpost-' . $ext;
+		if($file->getEtc($cacheKey)){
+			return $file->getEtc($cacheKey);
+		}
 		if(!isset($path)){
 			$path = $file->getPath();
 			if($ext !== $file->getExtension()){
@@ -509,6 +513,7 @@ class Blog extends Plugin{
 			//--ensure we still get name event
 			$post->processContent($post->getFile()->getContent(), $post->getFile()->getExtension());
 		}
+		$file->setEtc($cacheKey, $post);
 		return $post;
 	}
 	public function getPost(?string $path = null, ?string $pagePath = null, ?string $ext = null){
