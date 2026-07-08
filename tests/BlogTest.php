@@ -1,7 +1,9 @@
 <?php
 namespace TJM\WikiBlog\Tests;
 use DateTime;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use TJM\Wiki\Wiki;
 use TJM\WikiSite\WikiSite;
 use TJM\WikiBlog\Blog;
@@ -21,6 +23,14 @@ class BlogTest extends TestCase{
 		'/blog/tag/ipsum'=> 'ipsum posts',
 
 	];
+	static public function getNotFoundViewData(){
+		return [
+			['/blog.aspx'],
+			['/blog.foo'],
+			['/blog.php7'],
+			['/blog.txtt'],
+		];
+	}
 	public function testHtmlSuccessResponses(){
 		$wsite = $this->getWikiSite();
 		foreach(self::$htmlSuccessResponses as $path=> $expect){
@@ -29,6 +39,12 @@ class BlogTest extends TestCase{
 			$this->assertStringStartsWith('<!DOCTYPE html>', $response->getContent());
 			$this->assertStringContainsString($expect, $response->getContent());
 		}
+	}
+	#[DataProvider('getNotFoundViewData')]
+	public function test404Responses($path){
+		$wsite = $this->getWikiSite();
+		$this->expectException(NotFoundHttpException::class);
+		$response = $wsite->viewAction($path);
 	}
 	public function testMarkdownSuccessResponses(){
 		$wsite = $this->getWikiSite();
