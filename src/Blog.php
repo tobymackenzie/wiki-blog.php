@@ -564,8 +564,29 @@ class Blog extends Plugin{
 		$i = 0;
 		$found = false;
 		while(++$i < 30){
-			$sort = $newer ? Wiki::SORT_ASC : Wiki::SORT_DESC;
-			$pages = $this->getPages($checkPath, null, null, $sort);
+			$pages = $this->getPages($checkPath);
+			//--sort by date if available
+			usort($pages, function($a, $b) use($newer){
+				$aval = $a->getMeta('date');
+				$bval = $b->getMeta('date');
+				//--falback to id, which may be in order
+				if(!($aval && $bval)){
+					$aval = $a->getMeta('id');
+					$bval = $b->getMeta('id');
+				}
+				//--fallback to path, which would at least be alphabetical
+				if(!($aval && $bval)){
+					$aval = $a->getPath();
+					$bval = $b->getPath();
+				}
+				if($aval === $bval){
+					return 0;
+				}elseif($aval < $bval){
+					return $newer ? -1 : 1;
+				}else{
+					return $newer ? 1 : -1;
+				}
+			});
 			foreach($pages as $page){
 				if($found){
 					$adjPage = $page;

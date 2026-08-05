@@ -64,6 +64,9 @@ class BlogTest extends TestCase{
 		$response = $site->viewAction('/blog/2025/01/01/121');
 		$this->assertStringContainsString('Previous post: First Post', $response->getContent());
 		$this->assertStringContainsString('Next post: #1211', $response->getContent());
+		$response = $site->viewAction('/blog/2026/01/06/bar');
+		$this->assertStringContainsString('Previous post: The Foo', $response->getContent());
+		$this->assertStringContainsString('Next post: #125', $response->getContent());
 	}
 	public function testPublish(){
 		$path = __DIR__ . '/tmp';
