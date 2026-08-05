@@ -1,22 +1,10 @@
 #!/usr/bin/env php
 <?php
-//--pass wiki path to index
+require_once(__DIR__ . '/../vendor/autoload.php');
 if(!empty($argv[1])){
 	putenv("WIKI_PATH={$argv[1]}");
 }
-
-//--set up server
-chdir(__DIR__ . '/../demo');
-$port = 8080;
-$found = false;
-while(!$found){
-	$foundCount = (int) trim(shell_exec("netstat -anp tcp | grep '\.{$port}\s' | wc -l"));
-	if($foundCount === 1){
-		++$port;
-	}else{
-		$found = true;
-	}
-}
-echo "opening demo server on localhost:{$port}\n";
-passthru("php -S localhost:{$port}");
-
+TJM\Dev::srv([
+	'path'=> __DIR__ . '/../demo',
+	'message'=> "opening demo server on %s\n",
+]);
