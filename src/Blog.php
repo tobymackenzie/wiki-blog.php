@@ -46,7 +46,7 @@ class Blog extends Plugin{
 	//-! if categoryPath or tagPath empty, will need smarter logic to figure out what non-year strings match
 	protected string $categoryPath = 'category';
 	//-! protected int $detailPathType = self::POST_PATH_TO_MONTH;
-	protected string $feedPath = 'feed';
+	protected string $feedPath = 'feed.xml';
 	protected string $mediaPath = 'media';
 	protected string $mentionsPath = 'mentions';
 	protected string $tagPath = 'tag';
@@ -88,6 +88,15 @@ class Blog extends Plugin{
 		}
 		return $this->feedPath;
 	}
+	protected function getFeedPathRegex(){
+		$re = $this->getFeedPath();
+		$ext = pathinfo($re, PATHINFO_EXTENSION);
+		if($ext){
+			$re = substr($re, 0, strlen($re) - (strlen($ext) + 1));
+		}
+		$re = ":^{$re}(\.[\w]+)?/?$:i";
+		return $re;
+	}
 	protected function getMediaPath(){
 		if(substr($this->mediaPath, 0, 1) !== '/' && strpos($this->mediaPath, '://') === false){
 			return $this->blogPath . '/' . $this->mediaPath;
@@ -117,7 +126,7 @@ class Blog extends Plugin{
 			$subPath = substr($path, strlen($this->blogPath));
 			//-! bypass all of this if not htmlish or textish and file exists, just serve file directly
 			//--regex to determine page type, if not match, isBlog should be false, let regular WikiSite processing happen
-			if($this->getCategoryPath() !== $this->blogPath && preg_match(":^{$this->getFeedPath()}/?$:i", $path, $matches)){
+			if($this->getCategoryPath() !== $this->blogPath && preg_match($this->getFeedPathRegex(), $path, $matches)){
 				$type = $generalType = 'feed';
 			}elseif(preg_match(":^({$this->getMediaPath()}/.*)$:i", $path, $matches)){
 				return $this->getMediaResponse($matches[1]);
@@ -188,7 +197,13 @@ class Blog extends Plugin{
 			}
 			switch($generalType){
 				case 'feed':
-					$event->setResponse($this->getRssFeedResponse());
+					//--redirect if not matching feed path exactly
+					if($path === $this->getFeedPath()){
+						$event->setResponse($this->getRssFeedResponse());
+					}else{
+						$event->setCanonical($this->getFeedPath());
+						return;
+					}
 					return;
 				break;
 				case 'list':

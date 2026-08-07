@@ -113,6 +113,10 @@ class BlogTest extends TestCase{
 	public function testFeedResponse(){
 		$wsite = $this->getWikiSite();
 		$response = $wsite->viewAction('/blog/feed');
+		$this->assertEquals(302, $response->getStatusCode());
+		$response = $wsite->viewAction('/blog/feed.html');
+		$this->assertEquals(302, $response->getStatusCode());
+		$response = $wsite->viewAction('/blog/feed.xml');
 		$this->assertEquals(200, $response->getStatusCode());
 		$this->assertStringStartsWith('<?xml version="1.0" encoding="utf-8"?>', $response->getContent());
 		$this->assertStringContainsString('<rss version="2.0">', $response->getContent());
