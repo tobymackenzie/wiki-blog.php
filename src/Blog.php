@@ -858,7 +858,7 @@ class Blog extends Plugin{
 			$item->appendChild($doc->createElement('pubDate', $post->getDate()->format('D, d M Y H:i:s O')));
 			if($post->getGuid()){
 				$guid = $doc->createElement('guid', $post->getGuid());
-				$guid->setAttribute('isPermalink', 'false');
+				$guid->setAttribute('isPermaLink', 'false');
 			}else{
 				$guid = $doc->createElement('guid', $link);
 			}
