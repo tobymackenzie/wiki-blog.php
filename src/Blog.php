@@ -855,7 +855,7 @@ class Blog extends Plugin{
 			$desc = $doc->createElement('description');
 			$desc->appendChild($doc->createCDATASection($post->getExcerpt()));
 			$item->appendChild($desc);
-			$item->appendChild($doc->createElement('pubDate', $post->getDate()->format('D, d M Y H:i:s O')));
+			$item->appendChild($doc->createElement('pubDate', $post->getDate()->format(DateTime::RSS)));
 			if($post->getGuid()){
 				$guid = $doc->createElement('guid', $post->getGuid());
 				$guid->setAttribute('isPermaLink', 'false');
